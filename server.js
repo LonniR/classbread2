@@ -2,6 +2,8 @@
 const express = require('express')
 // DEPENDENCIES
 const methodOverride = require('method-override')
+const mongoose = require('mongoose')
+
 
 
 // CONFIGURATION
@@ -28,6 +30,12 @@ app.get('/', (req, res) => {
 // Breads
 const breadsController = require('./controllers/breads_controller.js')
 app.use('/breads', breadsController)
+
+mongoose.connect(process.env.MONGO_URI, {family:4}, function(err, connection) {
+  // connection.db('breads');
+  console.log('connected to DB!!!!!!!!')
+});
+
   
 // LISTEN
 app.listen(PORT, () => {
