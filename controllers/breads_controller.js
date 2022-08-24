@@ -1,31 +1,35 @@
 const express = require('express')
 const breads = express.Router()
 const Bread = require('../models/bread')
+const Baker = require ('../models/baker')
 console.log('CONTROLLER FILE LOADED!!!')
-// INDEX
+// Index:
 breads.get('/', (req, res) => {
-  console.log('Bread model', Bread)
-  // res.send('testing /breads route!!')
-  Bread.find()
+  Baker.find()
+    .then(foundBakers => {
+      Bread.find()
       .then(foundBreads => {
           res.render('index', {
               breads: foundBreads,
+              bakers: foundBakers,
               title: 'Index Page'
           })
       })
+    })
 })
 
-// res.send(Bread)
 
-
-// NEW
+// in the new route
 breads.get('/new', (req, res) => {
-  res.render('new')
+    Baker.find()
+        .then(foundBakers => {
+            res.render('new', {
+                bakers: foundBakers
+            })
+      })
 })
 
 
-// CREATE
-// CREATE
 // CREATE
 breads.post('/', (req, res) => {
   if(!req.body.image) {
@@ -43,30 +47,39 @@ breads.post('/', (req, res) => {
 
 // EDIT
 breads.get('/:id/edit', (req, res) => {
-  Bread.findById(req.params.id) 
-    .then(foundBread => { 
-      res.render('edit', {
-        bread: foundBread 
-      })
+  Baker.find()
+    .then(foundBakers => {
+        Bread.findById(req.params.id)
+          .then(foundBread => {
+            res.render('edit', {
+                bread: foundBread, 
+                bakers: foundBakers 
+            })
+          })
     })
 })
 
 
 
 
+
+// SHOW
 // SHOW
 // SHOW
 // SHOW
 breads.get('/:id', (req, res) => {
   Bread.findById(req.params.id)
+      .populate('baker')
       .then(foundBread => {
-        const bakedBy = foundBread.getBakedBy() 
-        console.log(bakedBy)
         res.render('show', {
             bread: foundBread
         })
       })
-    })
+      .catch(err => {
+        res.send('404')
+      })
+})
+
 
 breads.get('/data/seed', (req, res) => {
   Bread.insertMany([[
@@ -119,7 +132,22 @@ breads.put('/:id', (req, res) => {
       console.log(updatedBread) 
       res.redirect(`/breads/${req.params.id}`) 
     })
+
 })
+
+// in the new route
+breads.get('/new', (req, res) => {
+    Baker.find()
+        .then(foundBakers => {
+            res.render('new', {
+                bakers: foundBakers
+            })
+      })
+})
+
+
+
+                  
 
 
 
@@ -127,3 +155,4 @@ breads.put('/:id', (req, res) => {
 
 
 module.exports = breads
+
